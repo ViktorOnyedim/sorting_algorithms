@@ -7,7 +7,9 @@
  */
 void swap_ints(int *a, int *b)
 {
-	int temp = *a;
+	int temp;
+
+	temp = *a;
 	*a = *b;
 	*b = temp;
 }
@@ -23,30 +25,31 @@ void swap_ints(int *a, int *b)
  * Return: The final partition index.
  */
 
-int lomuto_partition(int *array, size_t size, int low, int high)
+int lomuto_partition(int *array, size_t size, int left, int right)
 {
-	int pivot, i, j;
+	int *pivot, above, below;
 
-	pivot = array[high];
-	i = low - 1;
-
-	for (j = low; j < high; j++)
+	pivot = array + right;
+	for (above = below = left; below < right; below++)
 	{
-		if (array[j] <= pivot)
+		if (array[below] < *pivot)
 		{
-			i++;
-			swap_ints(&array[i], &array[j]);
-			printf("Swapped %d and %d: ", array[i], array[j]);
-			print_array(array, size);
-			printf("first\n");
+			if (above < below)
+			{
+				swap_ints(array + below, array + above);
+				print_array(array, size);
+			}
+			above++;
 		}
 	}
 
-	swap_ints(&array[i + 1], &array[high]);
-	printf("Swapped %d and %d: ", array[i + 1], array[high]);
-	print_array(array, size);
-	printf("second\n");
-	return (i + 1);
+	if (array[above] > *pivot)
+	{
+		swap_ints(array + above, pivot);
+		print_array(array, size);
+	}
+
+	return (above);
 }
 
 /**
@@ -59,15 +62,15 @@ int lomuto_partition(int *array, size_t size, int low, int high)
  * Description: Uses the Lomuto partition scheme.
  */
 
-void quick_sort_recursive(int *array, size_t size, int low, int high)
+void quick_sort_recursive(int *array, size_t size, int left, int right)
 {
-	int pivot_index;
+	int part;
 
-	if (low < high)
+	if (right - left > 0)
 	{
-		pivot_index = lomuto_partition(array, size, low, high);
-		quick_sort_recursive(array, size, low, pivot_index - 1);
-		quick_sort_recursive(array, size, pivot_index + 1, high);
+		part = lomuto_partition(array, size, left, right);
+		quick_sort_recursive(array, size, left, part - 1);
+		quick_sort_recursive(array, size, part + 1, right);
 	}
 }
 
